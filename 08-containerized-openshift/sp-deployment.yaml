@@ -1,0 +1,71 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: shinyproxy
+  labels:
+    app: shinyproxy
+spec:
+  selector:
+    name: shinyproxy
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: shinyproxy
+    spec:
+      securityContext: {}
+      serviceAccount: deployer
+      serviceAccountName: deployer
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: sp-app
+          name: sp-app
+      containers:
+      - name: shinyproxy
+        image: shinyproxy-example
+        imagePullPolicy: Always
+        volumeMounts:
+            - mountPath: /opt/shinyproxy/application.yml
+              name: sp-app
+              subPath: sp
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+           failureThreshold: 3
+           httpGet:
+             path: /
+             port: 8080
+             scheme: HTTP
+           initialDelaySeconds: 3
+           periodSeconds: 10
+           successThreshold: 1
+           timeoutSeconds: 1
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2048M
+          requests:
+            cpu: 100m
+            memory: 1024M
+      - name: kube-proxy-sidecar
+        image: kube-proxy-sidecar
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8001
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2048M
+          requests:
+            cpu: 100m
+            memory: 1024M
