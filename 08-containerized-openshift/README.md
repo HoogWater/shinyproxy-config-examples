@@ -9,6 +9,7 @@ in the same cluster. To make the application accessible outside the cluster, a N
 2. Open a terminal, go to the directory containing the Dockerfile, and run the following command to build it:
 
 `curl -O https://storage.googleapis.com/kubernetes-release/release/v1.11.0/bin/linux/amd64/kubectl`
+
 `sudo docker build . -t kube-proxy-sidecar`
 
 3. Ensure the `kube-proxy-sidecar` image is available on all your kube nodes. E.g. by repeating the above steps on all nodes.
@@ -16,12 +17,15 @@ in the same cluster. To make the application accessible outside the cluster, a N
 5. Open a terminal, go to the directory containing the Dockerfile, and run the following command to build it:
 
 `curl -O https://www.shinyproxy.io/downloads/shinyproxy-2.1.0.jar`
+
 `sudo docker build . -t shinyproxy-example`
 
 6. Ensure the `shinyproxy-example` image is available on all your kube nodes.
 7. Open a terminal and connect to your Openshift Cluster( oc login ....).
 8. Create a project to run shiny proxy in.
+
 `oc new-project shinyproxy`
+
 9. Download the 3 `yaml` files from the folder where this README is located.
 10. Run the following command to ConfigMap containing the application.yml for your shinyproxy deployment(namespace used for the pods in this example is `shinyproxy`):
 
